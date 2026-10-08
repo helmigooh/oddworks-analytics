@@ -13,18 +13,28 @@ export type Account = {
 
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH"
 
+// Keep calculated scores within a consistent 0–100 range.
 function clamp(value: number) {
   return Math.max(0, Math.min(100, value))
 }
 
+// Share of licensed users who were active in the current 30-day period.
 export function calculateSeatUtilisation(account: Account) {
-  return clamp((account.activeUsers / account.licensedUsers) * 100)
+  if (account.licensedUsers === 0) {
+    return 0
+  }
+
+  return clamp(
+    (account.activeUsers / account.licensedUsers) * 100
+  )
 }
 
+// Translate usage change into a simple 0–100 health signal.
 export function calculateUsageHealth(trend: number) {
   return clamp(75 + trend * 1.5)
 }
 
+// Translate open and critical support issues into a health signal.
 export function calculateSupportHealth(
   openTickets: number,
   criticalTickets: number
@@ -44,6 +54,8 @@ export function calculateSupportHealth(
   return clamp(score)
 }
 
+// Rules-based health score.
+// Renewal timing is deliberately kept separate from account health.
 export function calculateHealthScore(account: Account) {
   const seatUtilisation = calculateSeatUtilisation(account)
   const usageHealth = calculateUsageHealth(account.usageTrend)
@@ -61,8 +73,15 @@ export function calculateHealthScore(account: Account) {
   return Math.round(score)
 }
 
+// Primary decision-support classification.
 export function getRiskLevel(score: number): RiskLevel {
-  if (score >= 75) return "LOW"
-  if (score >= 55) return "MEDIUM"
+  if (score >= 75) {
+    return "LOW"
+  }
+
+  if (score >= 55) {
+    return "MEDIUM"
+  }
+
   return "HIGH"
 }
