@@ -23,6 +23,31 @@ const riskOrder = {
   LOW: 2
 } as const
 
+// Shared visual helpers for scanability.
+function getHealthTextClass(score: number) {
+  if (score < 55) return "text-red-700 font-semibold"
+  if (score < 75) return "text-amber-700 font-semibold"
+  return "text-emerald-700 font-semibold"
+}
+
+function getMetricTextClass(value: number) {
+  if (value < 50) return "text-red-700 font-semibold"
+  if (value < 70) return "text-amber-700 font-semibold"
+  return "text-emerald-700 font-semibold"
+}
+
+function getUsageTrendClass(value: number) {
+  if (value < -10) return "text-red-700 font-semibold"
+  if (value < 0) return "text-amber-700 font-semibold"
+  return "text-emerald-700 font-semibold"
+}
+
+function getRenewalClass(days: number) {
+  if (days < 30) return "text-red-700 font-semibold"
+  if (days <= 60) return "text-amber-700 font-semibold"
+  return "text-slate-700"
+}
+
 export default function Home() {
   // Add calculated health signals to the synthetic account data.
   const portfolio = (accounts as Account[])
@@ -88,22 +113,22 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-500">
+          <div className="rounded-xl border border-red-200 bg-red-50/70 p-5">
+            <p className="text-sm text-red-700">
               High Risk
             </p>
 
-            <p className="mt-2 text-2xl font-semibold">
+            <p className="mt-2 text-2xl font-semibold text-red-800">
               {highRiskCount}
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-500">
+          <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-5">
+            <p className="text-sm text-amber-700">
               Medium Risk
             </p>
 
-            <p className="mt-2 text-2xl font-semibold">
+            <p className="mt-2 text-2xl font-semibold text-amber-800">
               {mediumRiskCount}
             </p>
           </div>
@@ -168,41 +193,15 @@ export default function Home() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-6 py-4 font-medium">
-                    Account
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Risk
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Health
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Seat Utilisation
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Workflow Adoption
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Usage Trend
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Support
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    Renewal
-                  </th>
-
-                  <th className="px-6 py-4 font-medium">
-                    ARR
-                  </th>
+                  <th className="px-6 py-4 font-medium">Account</th>
+                  <th className="px-6 py-4 font-medium">Risk</th>
+                  <th className="px-6 py-4 font-medium">Health</th>
+                  <th className="px-6 py-4 font-medium">Seat Utilisation</th>
+                  <th className="px-6 py-4 font-medium">Workflow Adoption</th>
+                  <th className="px-6 py-4 font-medium">Usage Trend</th>
+                  <th className="px-6 py-4 font-medium">Support</th>
+                  <th className="px-6 py-4 font-medium">Renewal</th>
+                  <th className="px-6 py-4 font-medium">ARR</th>
                 </tr>
               </thead>
 
@@ -215,7 +214,7 @@ export default function Home() {
                     <td className="px-6 py-4 font-medium">
                       <Link
                         href={`/accounts/${account.id}`}
-                        className="text-slate-900 hover:text-blue-600 hover:underline"
+                        className="text-slate-800 underline decoration-slate-300 underline-offset-4 transition hover:text-slate-950 hover:decoration-slate-500"
                       >
                         {account.name}
                       </Link>
@@ -235,32 +234,38 @@ export default function Home() {
                       </span>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${getHealthTextClass(account.healthScore)}`}>
                       {account.healthScore}
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${getMetricTextClass(account.seatUtilisation)}`}>
                       {account.seatUtilisation}%
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${getMetricTextClass(account.workflowAdoption)}`}>
                       {account.workflowAdoption}%
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${getUsageTrendClass(account.usageTrend)}`}>
                       {account.usageTrend > 0 ? "+" : ""}
                       {account.usageTrend}%
                     </td>
 
                     <td className="px-6 py-4">
-                      {account.openSupportTickets}
+                      <div className="leading-5">
+                        <p className="text-slate-700">
+                          {account.openSupportTickets} open
+                        </p>
 
-                      {account.criticalSupportTickets > 0
-                        ? ` (${account.criticalSupportTickets} critical)`
-                        : ""}
+                        {account.criticalSupportTickets > 0 && (
+                          <p className="text-xs font-semibold text-red-700">
+                            {account.criticalSupportTickets} critical
+                          </p>
+                        )}
+                      </div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className={`px-6 py-4 ${getRenewalClass(account.daysToRenewal)}`}>
                       {account.daysToRenewal} days
                     </td>
 

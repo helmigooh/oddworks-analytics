@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import accounts from "@/data/accounts.json"
+import AccountAnalysis from "@/components/AccountAnalysis"
 import {
   calculateHealthScore,
   calculateSeatUtilisation,
@@ -17,6 +18,30 @@ function formatCurrency(value: number) {
     currency: "EUR",
     maximumFractionDigits: 0
   }).format(value)
+}
+
+function getHealthTextClass(score: number) {
+  if (score < 55) return "text-red-700"
+  if (score < 75) return "text-amber-700"
+  return "text-emerald-700"
+}
+
+function getMetricTextClass(value: number) {
+  if (value < 50) return "text-red-700"
+  if (value < 70) return "text-amber-700"
+  return "text-emerald-700"
+}
+
+function getUsageTrendClass(value: number) {
+  if (value < -10) return "text-red-700"
+  if (value < 0) return "text-amber-700"
+  return "text-emerald-700"
+}
+
+function getRenewalClass(days: number) {
+  if (days < 30) return "text-red-700"
+  if (days <= 60) return "text-amber-700"
+  return "text-slate-900"
 }
 
 type AccountPageProps = {
@@ -37,7 +62,6 @@ export default async function AccountPage({
 }: AccountPageProps) {
   const { id } = await params
 
-  // Find the requested account.
   const account = (accounts as Account[]).find(
     (item) => item.id === id
   )
@@ -103,26 +127,50 @@ export default async function AccountPage({
 
         {/* Top-level account metrics */}
         <section className="mb-8 grid gap-4 md:grid-cols-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-500">
+          <div
+            className={`rounded-xl border p-5 ${
+              healthScore < 55
+                ? "border-red-200 bg-red-50/70"
+                : healthScore < 75
+                  ? "border-amber-200 bg-amber-50/70"
+                  : "border-emerald-200 bg-emerald-50/70"
+            }`}
+          >
+            <p className={`text-sm ${getHealthTextClass(healthScore)}`}>
               Health Score
             </p>
 
-            <p className="mt-2 text-3xl font-semibold">
+            <p
+              className={`mt-2 text-3xl font-semibold ${getHealthTextClass(
+                healthScore
+              )}`}
+            >
               {healthScore}
-              <span className="text-lg text-slate-400">
+              <span className="text-lg opacity-50">
                 {" "}
                 / 100
               </span>
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div
+            className={`rounded-xl border p-5 ${
+              account.daysToRenewal < 30
+                ? "border-red-200 bg-red-50/70"
+                : account.daysToRenewal <= 60
+                  ? "border-amber-200 bg-amber-50/70"
+                  : "border-slate-200 bg-white"
+            }`}
+          >
             <p className="text-sm text-slate-500">
               Renewal
             </p>
 
-            <p className="mt-2 text-2xl font-semibold">
+            <p
+              className={`mt-2 text-2xl font-semibold ${getRenewalClass(
+                account.daysToRenewal
+              )}`}
+            >
               {account.daysToRenewal} days
             </p>
           </div>
@@ -137,18 +185,26 @@ export default async function AccountPage({
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div
+            className={`rounded-xl border p-5 ${
+              account.criticalSupportTickets > 0
+                ? "border-red-200 bg-red-50/70"
+                : "border-slate-200 bg-white"
+            }`}
+          >
             <p className="text-sm text-slate-500">
               Support
             </p>
 
             <p className="mt-2 text-2xl font-semibold">
-              {account.openSupportTickets}
+              {account.openSupportTickets} open
             </p>
 
-            <p className="mt-1 text-xs text-slate-500">
-              {account.criticalSupportTickets} critical
-            </p>
+            {account.criticalSupportTickets > 0 && (
+              <p className="mt-1 text-xs font-semibold text-red-700">
+                {account.criticalSupportTickets} critical
+              </p>
+            )}
           </div>
         </section>
 
@@ -170,7 +226,11 @@ export default async function AccountPage({
                 Seat utilisation
               </p>
 
-              <p className="mt-2 text-xl font-semibold">
+              <p
+                className={`mt-2 text-xl font-semibold ${getMetricTextClass(
+                  seatUtilisation
+                )}`}
+              >
                 {seatUtilisation}%
               </p>
 
@@ -184,7 +244,11 @@ export default async function AccountPage({
                 Workflow adoption
               </p>
 
-              <p className="mt-2 text-xl font-semibold">
+              <p
+                className={`mt-2 text-xl font-semibold ${getMetricTextClass(
+                  account.workflowAdoption
+                )}`}
+              >
                 {account.workflowAdoption}%
               </p>
 
@@ -198,7 +262,11 @@ export default async function AccountPage({
                 Usage trend
               </p>
 
-              <p className="mt-2 text-xl font-semibold">
+              <p
+                className={`mt-2 text-xl font-semibold ${getUsageTrendClass(
+                  account.usageTrend
+                )}`}
+              >
                 {account.usageTrend > 0 ? "+" : ""}
                 {account.usageTrend}%
               </p>
@@ -213,11 +281,17 @@ export default async function AccountPage({
                 Support
               </p>
 
-              <p className="mt-2 text-xl font-semibold">
+              <p className="mt-2 text-xl font-semibold text-slate-900">
                 {account.openSupportTickets} open
               </p>
 
-              <p className="mt-1 text-xs text-slate-500">
+              <p
+                className={`mt-1 text-xs ${
+                  account.criticalSupportTickets > 0
+                    ? "font-semibold text-red-700"
+                    : "text-slate-500"
+                }`}
+              >
                 {account.criticalSupportTickets} critical
               </p>
             </div>
@@ -242,7 +316,11 @@ export default async function AccountPage({
                 Seat utilisation
               </span>
 
-              <span className="font-medium">
+              <span
+                className={`font-semibold ${getMetricTextClass(
+                  seatUtilisation
+                )}`}
+              >
                 {seatUtilisation}
               </span>
             </div>
@@ -252,7 +330,11 @@ export default async function AccountPage({
                 Workflow adoption
               </span>
 
-              <span className="font-medium">
+              <span
+                className={`font-semibold ${getMetricTextClass(
+                  account.workflowAdoption
+                )}`}
+              >
                 {account.workflowAdoption}
               </span>
             </div>
@@ -262,7 +344,11 @@ export default async function AccountPage({
                 Usage health
               </span>
 
-              <span className="font-medium">
+              <span
+                className={`font-semibold ${getMetricTextClass(
+                  usageHealth
+                )}`}
+              >
                 {usageHealth}
               </span>
             </div>
@@ -272,36 +358,19 @@ export default async function AccountPage({
                 Support health
               </span>
 
-              <span className="font-medium">
+              <span
+                className={`font-semibold ${getMetricTextClass(
+                  supportHealth
+                )}`}
+              >
                 {supportHealth}
               </span>
             </div>
           </div>
         </section>
 
-        {/* AI analysis placeholder */}
-        <section className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
-          <h2 className="font-semibold">
-            AI Account Analysis
-          </h2>
-
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-            Interpret the existing account signals, highlight relevant
-            risk drivers and suggest possible Customer Success actions.
-          </p>
-
-          <button
-            type="button"
-            disabled
-            className="mt-5 cursor-not-allowed rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-500"
-          >
-            Analyse Account
-          </button>
-
-          <p className="mt-3 text-xs text-slate-400">
-            AI-generated decision support · Human review required
-          </p>
-        </section>
+        {/* Interactive analysis */}
+        <AccountAnalysis account={account} />
       </div>
     </main>
   )
