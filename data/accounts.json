@@ -46,5 +46,53 @@
     "openSupportTickets": 7,
     "criticalSupportTickets": 2,
     "daysToRenewal": 67
+  },
+  {
+    "id": "lumina",
+    "name": "Lumina Health",
+    "arr": 108000,
+    "licensedUsers": 95,
+    "activeUsers": 83,
+    "workflowAdoption": 82,
+    "usageTrend": 14,
+    "openSupportTickets": 0,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 156
+  },
+  {
+    "id": "orbital",
+    "name": "Orbital Finance",
+    "arr": 64000,
+    "licensedUsers": 55,
+    "activeUsers": 34,
+    "workflowAdoption": 56,
+    "usageTrend": -7,
+    "openSupportTickets": 3,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 82
+  },
+  {
+    "id": "nova",
+    "name": "Nova Manufacturing",
+    "arr": 132000,
+    "licensedUsers": 140,
+    "activeUsers": 115,
+    "workflowAdoption": 73,
+    "usageTrend": 3,
+    "openSupportTickets": 2,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 204
+  },
+  {
+    "id": "harbor",
+    "name": "Harbor Logistics",
+    "arr": 88000,
+    "licensedUsers": 90,
+    "activeUsers": 52,
+    "workflowAdoption": 49,
+    "usageTrend": -11,
+    "openSupportTickets": 4,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 34
   }
 ]
