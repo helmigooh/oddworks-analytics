@@ -1,110 +1,192 @@
 "use client"
 
 import { useState } from "react"
-import {
-  analyseAccount,
-  type AccountAnalysis as AccountAnalysisResult
-} from "@/lib/analysis"
 import type { Account } from "@/lib/health"
 
 type AccountAnalysisProps = {
   account: Account
 }
 
+type AnalysisResult = {
+  summary: string
+  riskDrivers: string[]
+  nextActions: string[]
+}
+
 export default function AccountAnalysis({
   account
 }: AccountAnalysisProps) {
   const [analysis, setAnalysis] =
-    useState<AccountAnalysisResult | null>(null)
+    useState<AnalysisResult | null>(null)
 
-  const handleAnalyse = () => {
-    const result = analyseAccount(account)
-    setAnalysis(result)
+  const [isLoading, setIsLoading] =
+    useState(false)
+
+  const [error, setError] =
+    useState<string | null>(null)
+
+  async function handleAnalyse() {
+    setIsLoading(true)
+    setError(null)
+    setAnalysis(null)
+
+    try {
+      const response = await fetch("/api/analyse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          account
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(
+          "The account analysis could not be generated."
+        )
+      }
+
+      const result =
+        (await response.json()) as AnalysisResult
+
+      setAnalysis(result)
+    } catch (error) {
+      console.error(error)
+
+      setError(
+        "Unable to generate the AI analysis. Please try again."
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-6 py-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="font-semibold">
-              AI Account Analysis
-            </h2>
+    <section className="rounded-xl border border-slate-200 bg-white p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            AI Decision Support
+          </p>
 
-            <p className="mt-1 text-sm text-slate-500">
-              Interpret current account signals and surface possible next actions.
-            </p>
-          </div>
+          <h2 className="mt-1 text-xl font-semibold text-slate-900">
+            AI Account Analysis
+          </h2>
 
-          <button
-            type="button"
-            onClick={handleAnalyse}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-          >
-            Analyse Account
-          </button>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Interpret the available account signals and identify
+            potential risk drivers and areas for Customer Success
+            review.
+          </p>
         </div>
+
+        <button
+          type="button"
+          onClick={handleAnalyse}
+          disabled={isLoading}
+          className="inline-flex min-w-36 items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+        >
+          {isLoading
+            ? "Analysing..."
+            : analysis
+              ? "Analyse Again"
+              : "Analyse Account"}
+        </button>
       </div>
 
-      {!analysis ? (
-        <div className="px-6 py-8 text-sm text-slate-500">
-          Run the analysis to interpret the current account-health signals.
+      {!analysis && !isLoading && !error && (
+        <div className="mt-6 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+          Run the analysis to interpret the current account signals.
         </div>
-      ) : (
-        <div className="space-y-7 px-6 py-6">
-          {/* Health summary */}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Health Summary
-            </p>
+      )}
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+      {isLoading && (
+        <div className="mt-6 rounded-lg bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-800">
+            Analysing account signals...
+          </p>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Generating decision support from the available data only.
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-red-800">
+            Analysis failed
+          </p>
+
+          <p className="mt-1 text-sm text-red-700">
+            {error}
+          </p>
+        </div>
+      )}
+
+      {analysis && (
+        <div className="mt-6 space-y-6">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">
+              Health Summary
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-slate-700">
               {analysis.summary}
             </p>
           </div>
 
-          {/* Risk drivers */}
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <h3 className="text-sm font-semibold text-slate-900">
               Key Risk Drivers
-            </p>
+            </h3>
 
-            <ul className="mt-3 space-y-2">
-              {analysis.riskDrivers.map((driver) => (
-                <li
-                  key={driver}
-                  className="flex gap-3 text-sm leading-6 text-slate-700"
-                >
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
-                  <span>{driver}</span>
-                </li>
-              ))}
+            <ul className="mt-2 space-y-2">
+              {analysis.riskDrivers.map(
+                (driver, index) => (
+                  <li
+                    key={`${driver}-${index}`}
+                    className="flex gap-2 text-sm leading-6 text-slate-700"
+                  >
+                    <span className="text-slate-400">
+                      •
+                    </span>
+
+                    <span>{driver}</span>
+                  </li>
+                )
+              )}
             </ul>
           </div>
 
-          {/* Suggested next actions */}
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <h3 className="text-sm font-semibold text-slate-900">
               Suggested Next Actions
-            </p>
+            </h3>
 
-            <ul className="mt-3 space-y-2">
-              {analysis.nextActions.map((action) => (
-                <li
-                  key={action}
-                  className="flex gap-3 text-sm leading-6 text-slate-700"
-                >
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
-                  <span>{action}</span>
-                </li>
-              ))}
+            <ul className="mt-2 space-y-2">
+              {analysis.nextActions.map(
+                (action, index) => (
+                  <li
+                    key={`${action}-${index}`}
+                    className="flex gap-2 text-sm leading-6 text-slate-700"
+                  >
+                    <span className="text-slate-400">
+                      •
+                    </span>
+
+                    <span>{action}</span>
+                  </li>
+                )
+              )}
             </ul>
           </div>
 
           <div className="border-t border-slate-100 pt-4">
-            <p className="text-xs text-slate-400">
-              Prototype analysis based only on available account signals ·
-              Human review required
+            <p className="text-xs text-slate-500">
+              AI-generated decision support · Based only on available
+              account signals · Human review required
             </p>
           </div>
         </div>
