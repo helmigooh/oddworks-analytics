@@ -36,14 +36,25 @@ export async function POST(request: Request) {
     const accountSignals = {
       accountName: account.name,
       arr: account.arr,
-      healthScore,
-      riskLevel,
-      seatUtilisation,
-      workflowAdoption: account.workflowAdoption,
-      usageTrend: account.usageTrend,
-      openSupportTickets: account.openSupportTickets,
-      criticalSupportTickets: account.criticalSupportTickets,
-      daysToRenewal: account.daysToRenewal
+
+      healthAssessment: {
+        healthScore,
+        riskLevel
+      },
+
+      healthSignals: {
+        seatUtilisation,
+        workflowAdoption: account.workflowAdoption,
+        usageTrend: account.usageTrend,
+        usageTrendDefinition:
+          "Current 30 days compared with previous 30 days",
+        openSupportTickets: account.openSupportTickets,
+        criticalSupportTickets: account.criticalSupportTickets
+      },
+
+      renewalContext: {
+        daysToRenewal: account.daysToRenewal
+      }
     }
 
     const response = await openai.responses.create({
@@ -54,14 +65,46 @@ You are a Customer Success decision-support assistant for a B2B SaaS prototype.
 
 Interpret only the account signals provided.
 
-Rules:
-- Do not invent customer facts, causes, motivations, conversations or business context.
+The product deliberately separates ACCOUNT HEALTH from RENEWAL URGENCY.
+
+ACCOUNT HEALTH:
+- Health is based on seat utilisation, workflow adoption, usage trend and support signals.
+- The supplied health score and risk classification are calculated by the application.
+- Do not recalculate, challenge or modify them.
+- Health score and risk classification are outcomes of the underlying signals.
+- Never list the health score or risk classification themselves as risk drivers.
+
+RENEWAL URGENCY:
+- Days to renewal indicates how soon human review or follow-up may be needed.
+- Renewal proximity does NOT make an account unhealthy.
+- Do not list days to renewal as a health risk driver.
+- You may mention renewal timing in the summary and suggested actions when it materially increases urgency.
+
+USAGE TREND:
+- Usage trend compares the current 30 days with the previous 30 days.
+- Do not claim that the timeframe is unknown.
+- Do not invent causes for changes in usage.
+
+RISK DRIVERS:
+- Risk drivers must come only from seat utilisation, workflow adoption, usage trend and support signals.
+- Do not invent customer facts, motivations, conversations, causes or business context.
 - Do not infer causality from correlation.
-- Do not change or recalculate the provided health score or risk classification.
-- Distinguish observed signals from possible areas to investigate.
-- Suggested actions must be framed for a human Customer Success professional.
+- Phrase uncertainty explicitly where appropriate.
+- For LOW-risk accounts with no meaningful negative health signals, do not manufacture risk drivers.
+- In that situation, return a statement such as:
+  "No major negative health signals are currently visible."
+
+NEXT ACTIONS:
+- Actions must be suitable for a human Customer Success professional.
+- Use actions such as review, investigate, clarify, validate, discuss, prioritise or monitor.
+- Do not make autonomous customer or commercial decisions.
+- Do not claim that an action has already happened.
+- For LOW-risk accounts, prefer proportionate monitoring rather than unnecessary escalation.
+
+STYLE:
 - Be concise and professional.
 - Avoid alarmist language.
+- Distinguish observed signals from areas to investigate.
 - The output is decision support, not an autonomous decision.
 `,
 
