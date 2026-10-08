@@ -1,0 +1,50 @@
+[
+  {
+    "id": "northstar",
+    "name": "Northstar Retail",
+    "arr": 96000,
+    "licensedUsers": 80,
+    "activeUsers": 39,
+    "workflowAdoption": 42,
+    "usageTrend": -18,
+    "openSupportTickets": 5,
+    "criticalSupportTickets": 1,
+    "daysToRenewal": 41
+  },
+  {
+    "id": "brightlabs",
+    "name": "BrightLabs",
+    "arr": 72000,
+    "licensedUsers": 60,
+    "activeUsers": 51,
+    "workflowAdoption": 78,
+    "usageTrend": 9,
+    "openSupportTickets": 1,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 118
+  },
+  {
+    "id": "atlas",
+    "name": "Atlas Systems",
+    "arr": 124000,
+    "licensedUsers": 120,
+    "activeUsers": 91,
+    "workflowAdoption": 67,
+    "usageTrend": -4,
+    "openSupportTickets": 2,
+    "criticalSupportTickets": 0,
+    "daysToRenewal": 23
+  },
+  {
+    "id": "vertex",
+    "name": "Vertex Mobility",
+    "arr": 84000,
+    "licensedUsers": 75,
+    "activeUsers": 28,
+    "workflowAdoption": 34,
+    "usageTrend": -24,
+    "openSupportTickets": 7,
+    "criticalSupportTickets": 2,
+    "daysToRenewal": 67
+  }
+]
