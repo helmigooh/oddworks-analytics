@@ -1,4 +1,5 @@
 import Link from "next/link"
+import MemberAnalysis from "@/components/MemberAnalysis"
 import { notFound } from "next/navigation"
 import { fitnessMembers } from "@/data/fitness-members"
 import { assessRoutine } from "@/lib/routine"
@@ -354,6 +355,13 @@ export default async function MemberDetail({
             </div>
           </div>
         </section>
+
+        <div className="mt-6">
+          <MemberAnalysis
+            memberId={member.id}
+            routineStatus={assessment.status}
+          />
+        </div>
 
         <footer className="mt-6 text-xs leading-5 text-slate-500">
           Synthetic demonstration · Decision support only ·
