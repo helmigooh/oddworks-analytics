@@ -87,18 +87,46 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* Product header */}
-        <header className="mb-10">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Oddworks Analytics
-          </p>
+        <header className="mb-10 grid gap-8 md:grid-cols-2 md:gap-12">
 
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Customer Health Copilot
-          </h1>
+          <div>
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Oddworks Analytics
+            </p>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Identify accounts that may need attention before renewal.
-          </p>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Customer Health Copilot
+            </h1>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Identify accounts that may need attention before renewal.
+            </p>
+          </div>
+
+          <Link
+            href="/behaviour"
+            className="group block w-full max-w-md md:justify-self-end"
+          >
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Fitness · Customer Insights
+            </p>
+
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 transition-colors group-hover:text-slate-600">
+              Behaviour Insights
+              <span
+                aria-hidden="true"
+                className="ml-2 inline-block transition-transform group-hover:translate-x-1"
+              >
+                →
+              </span>
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Explore how training behaviour changes during the first
+              90 days of membership.
+            </p>
+          </Link>
+
         </header>
 
         {/* Portfolio summary */}

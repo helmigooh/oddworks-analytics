@@ -168,7 +168,12 @@ export default function BehaviourOverview() {
                       className="border-t border-slate-100 transition hover:bg-slate-50"
                     >
                       <td className="whitespace-nowrap px-5 py-4 font-medium">
-                        {member.name}
+                        <Link
+                          href={`/behaviour/${member.id}`}
+                          className="text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-slate-950"
+                        >
+                          {member.name}
+                        </Link>
                       </td>
 
                       <td className="whitespace-nowrap px-5 py-4 text-slate-600">
