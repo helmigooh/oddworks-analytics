@@ -15,10 +15,14 @@ export type FitnessMember = {
 }
 
 const clubs = [
-  "Club North",
-  "Club Central",
-  "Club South",
-  "Club West"
+  "Demo Club 01",
+  "Demo Club 02",
+  "Demo Club 03",
+  "Demo Club 04",
+  "Demo Club 05",
+  "Demo Club 06",
+  "Demo Club 07",
+  "Demo Club 08"
 ]
 
 // Illustrative training patterns.
@@ -52,7 +56,10 @@ export const fitnessMembers: FitnessMember[] =
     return {
       id: `MEM-${String(index + 1).padStart(3, "0")}`,
       name: `Member ${String(index + 1).padStart(3, "0")}`,
-      club: clubs[index % clubs.length],
+      club: clubs[
+        ((index % patterns.length) +
+          Math.floor(index / patterns.length)) % clubs.length
+      ],
       startDate,
       visitsByPeriod: [
         pattern[0],

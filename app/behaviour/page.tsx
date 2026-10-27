@@ -1,9 +1,14 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { fitnessMembers } from "@/data/fitness-members"
 import {
   assessRoutine,
   type RoutineStatus
 } from "@/lib/routine"
+
+type SortKey = "member" | "change" | "status"
 
 const statusOrder: Record<RoutineStatus, number> = {
   "At Risk": 0,
@@ -32,6 +37,23 @@ function getSignal(
 }
 
 export default function BehaviourOverview() {
+  const [sortKey, setSortKey] = useState<SortKey>("status")
+  const [ascending, setAscending] = useState(true)
+
+  function changeSort(key: SortKey) {
+    if (sortKey === key) {
+      setAscending((previous) => !previous)
+    } else {
+      setSortKey(key)
+      setAscending(true)
+    }
+  }
+
+  function sortIcon(key: SortKey) {
+    if (sortKey !== key) return "↕"
+    return ascending ? "↑" : "↓"
+  }
+
   const members = fitnessMembers
     .map((member) => ({
       ...member,
@@ -44,6 +66,34 @@ export default function BehaviourOverview() {
         a.assessment.changePercent -
           b.assessment.changePercent
     )
+
+  const sortedMembers = [...members].sort((a, b) => {
+    let result = 0
+
+    if (sortKey === "member") {
+      result = a.id.localeCompare(b.id)
+    } else if (sortKey === "change") {
+      result =
+        a.assessment.changePercent -
+        b.assessment.changePercent
+    } else {
+      result =
+        statusOrder[a.assessment.status] -
+        statusOrder[b.assessment.status]
+
+      if (result === 0) {
+        result =
+          a.assessment.changePercent -
+          b.assessment.changePercent
+      }
+    }
+
+    if (result === 0) {
+      result = a.id.localeCompare(b.id)
+    }
+
+    return ascending ? result : -result
+  })
 
   const countStatus = (status: RoutineStatus) =>
     members.filter(
@@ -147,19 +197,37 @@ export default function BehaviourOverview() {
 
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-5 py-4 font-medium">Member</th>
+                  <th className="px-5 py-4 font-medium"
+                      aria-sort={sortKey === "member" ? (ascending ? "ascending" : "descending") : "none"}>
+                    <button onClick={() => changeSort("member")}
+                      className="cursor-pointer hover:text-slate-900">
+                      Member {sortIcon("member")}
+                    </button>
+                  </th>
                   <th className="px-5 py-4 font-medium">Club</th>
                   <th className="px-5 py-4 font-medium">Started</th>
                   <th className="px-5 py-4 font-medium">Baseline</th>
                   <th className="px-5 py-4 font-medium">Current</th>
-                  <th className="px-5 py-4 font-medium">Change</th>
-                  <th className="px-5 py-4 font-medium">Status</th>
+                  <th className="px-5 py-4 font-medium"
+                      aria-sort={sortKey === "change" ? (ascending ? "ascending" : "descending") : "none"}>
+                    <button onClick={() => changeSort("change")}
+                      className="cursor-pointer hover:text-slate-900">
+                      Change {sortIcon("change")}
+                    </button>
+                  </th>
+                  <th className="px-5 py-4 font-medium"
+                      aria-sort={sortKey === "status" ? (ascending ? "ascending" : "descending") : "none"}>
+                    <button onClick={() => changeSort("status")}
+                      className="cursor-pointer hover:text-slate-900">
+                      Status {sortIcon("status")}
+                    </button>
+                  </th>
                   <th className="px-5 py-4 font-medium">Signal</th>
                 </tr>
               </thead>
 
               <tbody>
-                {members.map((member) => {
+                {sortedMembers.map((member) => {
                   const a = member.assessment
 
                   return (
