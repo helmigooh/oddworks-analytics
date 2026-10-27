@@ -92,7 +92,14 @@ ACTIONS:
 - For stable members, avoid unnecessary escalation.
 
 MEASUREMENT:
-- Explain how a proposed intervention could be evaluated.
+- Distinguish research comparisons from intervention evaluation.
+- Stable members may serve as research references for understanding differences.
+- Do not recommend unnecessary intervention for stable members.
+- Stable members are not an appropriate control group for estimating
+  intervention effects among members with declining routines.
+- If recommending an intervention pilot, suggest comparing similar
+  declining-routine members with and without the intervention.
+- Specify relevant outcomes, a follow-up period and guardrails.
 - Distinguish suggested measurement from actual results.
 - Do not invent intervention outcomes or causal effects.
 

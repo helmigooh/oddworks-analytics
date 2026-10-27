@@ -314,46 +314,64 @@ export default async function MemberDetail({
           </p>
         </section>
 
-        {/* Measurement */}
+        {/* Research reference vs intervention measurement */}
         <section className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="font-semibold">
-            How would we measure impact?
+            {assessment.status === "Stable"
+              ? "How can stable members inform research?"
+              : "How would we measure impact?"}
           </h2>
 
           <div className="mt-4 grid gap-5 md:grid-cols-3">
             <div>
               <p className="text-sm font-semibold">
-                Primary outcome
+                {assessment.status === "Stable"
+                  ? "Reference pattern"
+                  : "Primary outcome"}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Training frequency and routine stability
-                following a potential intervention.
+                {assessment.status === "Stable"
+                  ? "Understand what characterises a stable training routine over the first 90 days."
+                  : "Evaluate training frequency and routine stability over a defined follow-up period."}
               </p>
             </div>
 
             <div>
               <p className="text-sm font-semibold">
-                Comparison
+                {assessment.status === "Stable"
+                  ? "Research comparison"
+                  : "Pilot comparison"}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Compare with a suitable group not receiving
-                the intervention.
+                {assessment.status === "Stable"
+                  ? "Compare patterns and explore expectations, support and barriers with members whose activity declines."
+                  : "Compare similar declining-routine members receiving a training review with a suitable group not receiving it."}
               </p>
             </div>
 
             <div>
               <p className="text-sm font-semibold">
-                Guardrails
+                {assessment.status === "Stable"
+                  ? "Research guardrail"
+                  : "Guardrails"}
               </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Club staff effort, communication burden
-                and member feedback.
+                {assessment.status === "Stable"
+                  ? "Behavioural differences do not establish causes. No intervention is indicated by these signals alone."
+                  : "Monitor club staff effort, communication burden and member feedback. Define success criteria before testing."}
               </p>
             </div>
           </div>
+
+          {assessment.status !== "Stable" && (
+            <p className="mt-5 border-t border-slate-100 pt-4 text-xs leading-5 text-slate-500">
+              Stable members can inform research, but are not an appropriate
+              control group for estimating the effect of this intervention.
+            </p>
+          )}
         </section>
 
         <div className="mt-6">
